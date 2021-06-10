@@ -24,30 +24,30 @@ ENV NODEJS_VERSION=14 \
 
 ENV SUMMARY="Platform for building and running Node.js $NODEJS_VERSION applications" \
     DESCRIPTION="Node.js $NODEJS_VERSION available as container is a base platform for \
-building and running various Node.js $NODEJS_VERSION applications and frameworks. \
-Node.js is a platform built on Chrome's JavaScript runtime for easily building \
-fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model \
-that makes it lightweight and efficient, perfect for data-intensive real-time applications \
-that run across distributed devices."
+    building and running various Node.js $NODEJS_VERSION applications and frameworks. \
+    Node.js is a platform built on Chrome's JavaScript runtime for easily building \
+    fast, scalable network applications. Node.js uses an event-driven, non-blocking I/O model \
+    that makes it lightweight and efficient, perfect for data-intensive real-time applications \
+    that run across distributed devices."
 
 LABEL summary="$SUMMARY" \
-      description="$DESCRIPTION" \
-      io.k8s.description="$DESCRIPTION" \
-      io.k8s.display-name="Node.js $NODEJS_VERSION" \
-      io.openshift.expose-services="8080:http" \
-      io.openshift.tags="builder,$NAME,${NAME}${NODEJS_VERSION}" \
-      io.openshift.s2i.scripts-url="image:///usr/libexec/s2i" \
-      io.s2i.scripts-url="image:///usr/libexec/s2i" \
-      com.redhat.dev-mode="DEV_MODE:false" \
-      com.redhat.deployments-dir="${APP_ROOT}/src" \
-      com.redhat.dev-mode.port="DEBUG_PORT:5858" \
-      com.redhat.component="${NAME}-${NODEJS_VERSION}-container" \
-      name="ubi8/$NAME-$NODEJS_VERSION" \
-      version="1" \
-      com.redhat.license_terms="https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI" \
-      maintainer="SoftwareCollections.org <sclorg@redhat.com>" \
-      help="For more information visit https://github.com/sclorg/s2i-nodejs-container" \
-      usage="s2i build <SOURCE-REPOSITORY> ubi8/$NAME-$NODEJS_VERSION:latest <APP-NAME>"
+    description="$DESCRIPTION" \
+    io.k8s.description="$DESCRIPTION" \
+    io.k8s.display-name="Node.js $NODEJS_VERSION" \
+    io.openshift.expose-services="8080:http" \
+    io.openshift.tags="builder,$NAME,${NAME}${NODEJS_VERSION}" \
+    io.openshift.s2i.scripts-url="image:///usr/libexec/s2i" \
+    io.s2i.scripts-url="image:///usr/libexec/s2i" \
+    com.redhat.dev-mode="DEV_MODE:false" \
+    com.redhat.deployments-dir="${APP_ROOT}/src" \
+    com.redhat.dev-mode.port="DEBUG_PORT:5858" \
+    com.redhat.component="${NAME}-${NODEJS_VERSION}-container" \
+    name="ubi8/$NAME-$NODEJS_VERSION" \
+    version="1" \
+    com.redhat.license_terms="https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI" \
+    maintainer="SoftwareCollections.org <sclorg@redhat.com>" \
+    help="For more information visit https://github.com/sclorg/s2i-nodejs-container" \
+    usage="s2i build <SOURCE-REPOSITORY> ubi8/$NAME-$NODEJS_VERSION:latest <APP-NAME>"
 
 RUN yum -y module enable nodejs:$NODEJS_VERSION && \
     MODULE_DEPS="make gcc gcc-c++ libatomic_ops" && \
@@ -56,13 +56,13 @@ RUN yum -y module enable nodejs:$NODEJS_VERSION && \
     ln -s /usr/libexec/platform-python /usr/bin/python3 && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rpm -V $INSTALL_PKGS && \
-    yum -y clean all --enablerepo='*' \
+    yum -y clean all --enablerepo='*' && \
     npm install -g yarn -s &>/dev/null
-    
+
 # Install OpenShift CLI tool
- RUN wget https://github.com/openshift/okd/releases/download/4.6.0-0.okd-2021-01-23-132511/openshift-client-linux-4.6.0-0.okd-2021-01-23-132511.tar.gz && \
-     tar -xf openshift-client-linux-4.5.0-0.okd-2020-09-04-180756.tar.gz && \
-     ln -s $(pwd)/oc /usr/bin/oc 
+RUN wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/openshift-client-linux.tar.gz && \
+    tar -xf openshift-client-linux.tar.gz && \
+    ln -s $(pwd)/oc /usr/bin/oc 
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH
