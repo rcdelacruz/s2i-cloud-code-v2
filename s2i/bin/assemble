@@ -62,6 +62,7 @@ fi
 # Change the npm registry mirror if provided
 if [ -n "$NPM_MIRROR" ]; then
 	npm config set registry $NPM_MIRROR
+	yarn config set registry $NPM_MIRROR
 fi
 
 # Set the DEV_MODE to false by default.
