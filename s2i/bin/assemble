@@ -7,6 +7,12 @@
 
 set -e
 
+# Setting 'trap' command to catch error and call build error hooks if error was encountered
+trap 'sh /usr/libexec/s2i/hooks/build-error' ERR
+
+# Calling prebuild hooks
+sh /usr/libexec/s2i/hooks/prebuild
+
 # FIXME: Linking of global modules is disabled for now as it causes npm failures
 #        under RHEL7
 # Global modules good to have
