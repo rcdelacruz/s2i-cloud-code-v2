@@ -9,4 +9,4 @@ if [ ! -z "$CRAFT_APP_ID" ]; then
         -d '{"appId": "'"$CRAFT_APP_ID"'", "status": "BUILD_ERROR"}' $ADMIN_PARSE_SERVER_URL/functions/updateAppStatus
 fi
 
-echo "---> Done running build error hooks ..."
+echo -e "\n---> Done running build error hooks ..."
