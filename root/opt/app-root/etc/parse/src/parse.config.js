@@ -1,3 +1,4 @@
+const FSFilesAdapter = require("@parse/fs-files-adapter");
 module.exports = {
   databaseURI: process.env.DATABASE_URI || "mongodb://localhost:27017/dev",
   appId: process.env.APP_ID || "myAppId",
@@ -27,4 +28,10 @@ module.exports = {
         }
       : {},
   verbose: false,
+  filesAdapter: {
+    module: "@parse/fs-files-adapter",
+    options: {
+      encryptionKey: process.env.FILE_ENCRYPTION_KEY || "f1l33ncrypt10nk3y", //optional, but mandatory if you want to encrypt files
+    },
+  },
 };
