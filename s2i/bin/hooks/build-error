@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "---> Running build error hooks ..."
+
+# Update status of app in database and notify user for the app build error
+if [ ! -z "$CRAFT_APP_ID" ]; then
+    echo "---> Calling updateAppStatus cloud code ..."
+    curl -X POST -H "X-Parse-Application-Id: $ADMIN_PARSE_APP_ID" -H "X-Parse-Master-Key: $ADMIN_PARSE_MASTER_KEY" -H "Content-Type: application/json" \
+        -d '{"appId": "'"$CRAFT_APP_ID"'", "status": "BUILD_ERROR"}' $ADMIN_PARSE_SERVER_URL/functions/updateAppStatus
+fi
+
+echo -e "\n---> Done running build error hooks ..."
