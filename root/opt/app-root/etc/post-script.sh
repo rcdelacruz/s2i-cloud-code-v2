@@ -4,3 +4,5 @@
 #cp -r /opt/app-root/etc/parse/src/cloud/. /opt/app-root/src/cloud
 cp /opt/app-root/etc/parse/src/parse.config.js /opt/app-root/src/parse.config.js
 cp /opt/app-root/etc/parse/src/index.js /opt/app-root/src/index.js
+#added support for S3 file upload
+npm install --save @parse/s3-files-adapter

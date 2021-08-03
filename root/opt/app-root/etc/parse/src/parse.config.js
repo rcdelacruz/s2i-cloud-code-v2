@@ -29,9 +29,26 @@ module.exports = {
       : {},
   verbose: false,
   filesAdapter: {
-    module: "@parse/fs-files-adapter",
+    module: "@parse/s3-files-adapter",
     options: {
-      encryptionKey: process.env.FILE_ENCRYPTION_KEY || "f1l33ncrypt10nk3y", //optional, but mandatory if you want to encrypt files
+      bucket: process.env.S3_BUCKET_NAME,
+      // optional:
+      region: "us-west-2", // default value
+      bucketPrefix: "", // default value
+      directAccess: false, // default value
+      fileAcl: null, // default value
+      baseUrl: null, // default value
+      baseUrlDirect: false, // default value
+      signatureVersion: "v4", // default value
+      globalCacheControl: null, // default value. Or 'public, max-age=86400' for 24 hrs Cache-Control
+      ServerSideEncryption: "AES256|aws:kms", //AES256 or aws:kms, or if you do not pass this, encryption won't be done
+      validateFilename: null, // Default to parse-server FilesAdapter::validateFilename.
+      generateKey: null, // Will default to Parse.FilesController.preserveFileName
+      s3overrides: {
+        accessKeyId: process.env.S3_AWS_KEY,
+        secretAccessKey: process.env.S3_AWS_SECRET,
+      },
     },
   },
+  maxUploadSize: process.env.MAX_UPLOAD_SIZE,
 };
