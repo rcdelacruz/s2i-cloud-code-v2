@@ -7,13 +7,14 @@ require("dotenv").config();
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const { default: ParseServer, ParseGraphQLServer } = require("parse-server");
 const ParseDashboard = require("parse-dashboard");
 const args = process.argv || [];
 const test = args.some((arg) => arg.includes("jasmine"));
 
 const config = require("./parse.config");
-const databaseUri = process.env.DATABASE_URI;
+const databaseUri = process.env.DATABASE_URI || config.databaseURI;
 
 if (!databaseUri) {
   console.log("DATABASE_URI not specified, falling back to localhost.");
@@ -65,17 +66,20 @@ if (!test && config.filesAdapter.module === "@parse/s3-files-adapter") {
   // This will run cron job to remove orphaned files
   var CronJob = require("cron").CronJob;
   var job = new CronJob(
-    "0 0 * * * *",
+    "0 0 0 * * *", // Run the Job every 12 Midnight Server Time
     function () {
       cleanUpS3Bucket();
     },
     null,
-    true
+    true,
+    "Asia/Manila"
   );
   job.start();
 }
 
-// This will enable and handle your CORS settings
+if (process.env.NODE_ENV !== "development") apps.use(helmet());
+
+//This will enable and handle your CORS settings
 try {
   allowedOrigins = require("./cors.config");
   if (Object.values(allowedOrigins).length !== 0) {
@@ -117,9 +121,16 @@ if (process.env.NODE_ENV === "development" && !test) {
     "/dashboard",
     new ParseDashboard(
       {
+        allowInsecureHTTP: true,
+        trustProxy: 1,
         apps: [
           {
-            serverURL: config.serverURL,
+            serverURL:
+              process.env.USER === "gitpod"
+                ? `https://1337-${
+                    new URL(process.env.GITPOD_WORKSPACE_URL).hostname
+                  }/parse`
+                : config.serverURL,
             graphQLServerURL: config.graphQLServerURL,
             appId: config.appId,
             masterKey: config.masterKey,
@@ -170,12 +181,21 @@ if (!test) {
  */
 
 function cleanUpS3Bucket() {
-  console.log("Cleaning up S3 bucket");
+  console.log("Cleaning up S3 bucket", new Date().toString());
   const AWS = require("aws-sdk");
 
   const { options } = config.filesAdapter;
+  const bucketOptions = options.bucket.split("/");
+  if (!bucketOptions || bucketOptions.length < 2) {
+    throw new Error("Invalid S3 bucket name provided");
+  }
+
+  const bucket = bucketOptions[0];
+  bucketOptions.shift();
+  const prefix = bucketOptions.join("/");
+
   const s3Options = {
-    params: { Bucket: options.bucket },
+    params: { Bucket: bucket, Prefix: prefix },
     region: options.region,
     signatureVersion: options.signatureVersion,
     globalCacheControl: options.globalCacheControl,
@@ -196,7 +216,8 @@ function cleanUpS3Bucket() {
           const fileNames = parseFiles.map((file) => file.fileName);
 
           for (const s3Obj of data.Contents) {
-            if (fileNames.indexOf(s3Obj.Key) === -1) {
+            s3ObjKeyFileName = s3Obj.Key.split("/").pop();
+            if (fileNames.indexOf(s3ObjKeyFileName) === -1) {
               deleteFilesInS3(s3Obj.Key, s3Client);
             }
           }
