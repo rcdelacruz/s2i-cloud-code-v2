@@ -77,7 +77,7 @@ if (!test && config.filesAdapter.module === "@parse/s3-files-adapter") {
   job.start();
 }
 
-if (process.env.NODE_ENV !== "development") apps.use(helmet());
+if (process.env.NODE_ENV !== "development") app.use(helmet());
 
 //This will enable and handle your CORS settings
 try {
